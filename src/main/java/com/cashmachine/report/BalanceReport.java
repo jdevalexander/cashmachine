@@ -1,5 +1,8 @@
 package com.cashmachine.report;
 
+/**
+ * Class report showing card balance information with current date
+ */
 public class BalanceReport {
 
     private Long cardNumber;

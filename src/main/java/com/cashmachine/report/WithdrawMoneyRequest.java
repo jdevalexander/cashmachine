@@ -1,7 +1,9 @@
 package com.cashmachine.report;
 
+/**
+ * Class request for withdraw amount of money? using in post/put methods
+ */
 public class WithdrawMoneyRequest {
-
 
     private Long cardNumber;
     private Integer pinCode;
