@@ -3,6 +3,7 @@ package com.cashmachine.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 
 @Entity
@@ -12,6 +13,7 @@ public class OperationLog {
     private Long date;
     private String operationCode;
     private Long withdrewMoney;
+    private Integer cardId;
 
     @Id
     @JsonIgnore
@@ -56,6 +58,16 @@ public class OperationLog {
         this.withdrewMoney = withdrewMoney;
     }
 
+    @Basic
+    @Column(name = "card_id")
+    public Integer getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(Integer cardId) {
+        this.cardId = cardId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -63,11 +75,13 @@ public class OperationLog {
 
         OperationLog that = (OperationLog) o;
 
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (date != null ? !date.equals(that.date) : that.date != null) return false;
-        if (operationCode != null ? !operationCode.equals(that.operationCode) : that.operationCode != null)
+        if (!Objects.equals(id, that.id)) return false;
+        if (!Objects.equals(date, that.date)) return false;
+        if (!Objects.equals(operationCode, that.operationCode))
             return false;
-        return withdrewMoney != null ? withdrewMoney.equals(that.withdrewMoney) : that.withdrewMoney == null;
+        if (!Objects.equals(withdrewMoney, that.withdrewMoney))
+            return false;
+        return Objects.equals(cardId, that.cardId);
     }
 
     @Override
@@ -76,8 +90,8 @@ public class OperationLog {
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + (operationCode != null ? operationCode.hashCode() : 0);
         result = 31 * result + (withdrewMoney != null ? withdrewMoney.hashCode() : 0);
+        result = 31 * result + (cardId != null ? cardId.hashCode() : 0);
         return result;
     }
-
 
 }

@@ -96,7 +96,7 @@ public class CardInfo {
     private List<OperationLog> operationLogs;
 
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "card_id")
     public List<OperationLog> getOperationLogs() {
         return operationLogs;

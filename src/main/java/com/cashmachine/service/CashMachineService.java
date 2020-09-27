@@ -3,7 +3,9 @@ package com.cashmachine.service;
 import com.cashmachine.model.CardInfo;
 import com.cashmachine.model.OperationLog;
 import com.cashmachine.report.BalanceReport;
+import com.cashmachine.report.BlockCardRequest;
 import com.cashmachine.report.WithdrawMoneyReport;
+import com.cashmachine.report.WithdrawMoneyRequest;
 import com.cashmachine.repository.CardInfoRepository;
 import com.cashmachine.repository.OperationCatalogRepository;
 import com.cashmachine.repository.OperationLogRepository;
@@ -41,8 +43,8 @@ public class CashMachineService {
     }
 
 
-    public boolean blockCard(Long cardNumber) {
-        CardInfo notBlockedCard = cardInfoRepository.getNotBlockedCard(cardNumber);
+    public boolean blockCard(BlockCardRequest request) {
+        CardInfo notBlockedCard = cardInfoRepository.getNotBlockedCard(request.getCardNumber());
 
         if (!ObjectUtils.isEmpty(notBlockedCard)) {
 
@@ -61,18 +63,18 @@ public class CashMachineService {
     }
 
 
-    public WithdrawMoneyReport withdrawMoney(Long cardNumber, Integer pinCode, Long moneyAmount) {
-        CardInfo notBlockedCard = cardInfoRepository.getNotBlockedCard(cardNumber, pinCode);
+    public WithdrawMoneyReport withdrawMoney(WithdrawMoneyRequest request) {
+        CardInfo notBlockedCard = cardInfoRepository.getNotBlockedCard(request.getCardNumber(), request.getPinCode());
         if (!ObjectUtils.isEmpty(notBlockedCard)) {
             Long currentBalance = notBlockedCard.getBalance();
 
             //User cannot amount more money than on balance
-            if (currentBalance < moneyAmount) {
+            if (currentBalance < request.getMoneyAmount()) {
                 return null;
             }
 
             //Change card balance
-            notBlockedCard.setBalance(currentBalance - moneyAmount);
+            notBlockedCard.setBalance(currentBalance - request.getMoneyAmount());
 
             List<OperationLog> operationLogs = notBlockedCard.getOperationLogs();
 
@@ -80,14 +82,15 @@ public class CashMachineService {
             OperationLog operationLog = new OperationLog();
             operationLog.setDate(new Date().getTime());
             operationLog.setOperationCode("withdraw_money");
-            operationLog.setWithdrewMoney(moneyAmount);
+            operationLog.setWithdrewMoney(request.getMoneyAmount());
+            operationLog.setCardId(notBlockedCard.getId());
             operationLogs.add(operationLog);
 
             notBlockedCard.setOperationLogs(operationLogs);
 
             //Create response report withdraw Money Report
             WithdrawMoneyReport withdrawMoneyReport = new WithdrawMoneyReport();
-            withdrawMoneyReport.setMoneyAmount(moneyAmount);
+            withdrawMoneyReport.setMoneyAmount(request.getMoneyAmount());
             withdrawMoneyReport.setCardBalance(notBlockedCard.getBalance());
             withdrawMoneyReport.setCardNumber(notBlockedCard.getCardNumber());
             withdrawMoneyReport.setDate(new Date().getTime());
@@ -120,6 +123,7 @@ public class CashMachineService {
             OperationLog operationLog = new OperationLog();
             operationLog.setDate(new Date().getTime());
             operationLog.setOperationCode("show_balance");
+            operationLog.setCardId(notBlockedCard.getId());
             operationLogs.add(operationLog);
 
             notBlockedCard.setOperationLogs(operationLogs);
